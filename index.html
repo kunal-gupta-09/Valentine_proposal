@@ -146,6 +146,10 @@
     transform-style: preserve-3d;
     transition: transform 0.6s ease;
   }
+  .jackpot-cards.flip-slow .jackpot-card .card-inner {
+    transition-duration: 1.2s;
+    transition-timing-function: ease-in-out;
+  }
   .jackpot-card.flipped .card-inner { transform: rotateY(180deg); }
   .card-back, .card-front {
     position: absolute;
@@ -594,6 +598,47 @@
     opacity: 1;
     pointer-events: auto;
   }
+  /* Congratulations / wait screen (image + message + continue) */
+  #revealArea .congrats-screen-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 24px 20px 28px;
+  }
+  #revealArea .congrats-screen-wrap .congrats-img {
+    width: 100%;
+    max-width: 180px;
+    height: auto;
+    margin: 0 0 20px;
+    display: block;
+    object-fit: contain;
+  }
+  #revealArea .congrats-screen-wrap .congrats-message {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.35rem;
+    color: #333;
+    line-height: 1.6;
+    margin: 0 0 28px;
+    max-width: 320px;
+  }
+  #revealArea .congrats-screen-wrap .congrats-continue-btn {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    padding: 14px 32px;
+    font-size: 18px;
+    border: none;
+    border-radius: 30px;
+    background: #ff4d6d;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    box-shadow: 0 4px 16px rgba(255, 77, 109, 0.4);
+    transition: background 0.2s, transform 0.15s;
+  }
+  #revealArea .congrats-screen-wrap .congrats-continue-btn:hover {
+    background: #e84393;
+    transform: scale(1.02);
+  }
   #revealArea .buttons button { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 12px 24px; border-radius: 30px; border: none; font-size: 16px; cursor: pointer; }
   #revealArea #yesBtn { background: #ff4d6d; color: white; }
   #revealArea #noBtn { background: #f1f1f1; position: absolute; }
@@ -722,17 +767,19 @@
     opacity: 0;
     animation: emojiRushUp 4.4s ease-out forwards;
     text-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transform: translateX(-50%);
+    --start-y: 0vh;
   }
   @keyframes emojiRushUp {
     0% {
-      transform: translateY(0) scale(0.5);
+      transform: translateX(-50%) translateY(var(--start-y)) scale(0.5);
       opacity: 0.85;
     }
     15% {
       opacity: 0.95;
     }
     100% {
-      transform: translateY(-130vh) scale(1.1);
+      transform: translateX(-50%) translateY(-130vh) scale(1.1);
       opacity: 0.25;
     }
   }
@@ -785,7 +832,7 @@
 
 <div id="cardsScreen" class="screen hidden">
   <div id="cardsContainer" class="jackpot-cards"></div>
-  <button type="button" id="continueMadnessBtn" class="continue-madness-btn hidden">Continue the madness</button>
+  <button type="button" id="continueMadnessBtn" class="continue-madness-btn hidden">Congratulations</button>
 </div>
 
 <div id="revealArea">
@@ -1014,16 +1061,26 @@ function showEmojiRushThenStart() {
   }
   emojiRushContainer.innerHTML = '';
   var count = 56;
-  var minSize = 3.5;
-  var maxSize = 9;
+  var minSize = 3;
+  var maxSize = 6;
   var visibilityMs = 5600;
   var animationDurationMs = 4400;
   var maxDelaySec = (visibilityMs - animationDurationMs) / 1000;
+  var cols = 10;
+  var rows = Math.ceil(count / cols);
+  var startYStep = 22;
   for (var i = 0; i < count; i++) {
+    var col = i % cols;
+    var row = Math.floor(i / cols);
+    var cellW = 100 / cols;
+    var jitter = (Math.random() - 0.5) * cellW * 0.4;
+    var leftPct = (col + 0.5) * cellW + jitter;
+    var startY = row * startYStep;
     var el = document.createElement('span');
     el.className = 'emoji-rush-item';
     el.textContent = EMOJI_RUSH_SYMBOLS[Math.floor(Math.random() * EMOJI_RUSH_SYMBOLS.length)];
-    el.style.left = (Math.random() * 92 + 2) + '%';
+    el.style.left = leftPct + '%';
+    el.style.setProperty('--start-y', startY + 'vh');
     el.style.fontSize = (minSize + Math.random() * (maxSize - minSize)).toFixed(1) + 'rem';
     el.style.animationDelay = (count > 1 ? (i / (count - 1)) * maxDelaySec : 0) + 's';
     emojiRushContainer.appendChild(el);
@@ -1221,6 +1278,37 @@ function attachProposalListeners() {
   });
 }
 
+function getCongratulationsScreenHTML() {
+  var msg = "You found all the surprises! There's one more thing I've been wanting to ask you…";
+  return '<div class="congrats-screen-wrap">' +
+    '<img src="images/wait.png" alt="" class="congrats-img">' +
+    '<p class="congrats-message">' + msg.replace(/</g, '&lt;').replace(/&/g, '&amp;') + '</p>' +
+    '<button type="button" class="congrats-continue-btn" id="congratsContinueBtn">Continue</button>' +
+    '</div>';
+}
+
+function showCongratulationsMessage() {
+  cardsScreen.classList.add('cards-fade-out');
+  var fadeDuration = 1000;
+  setTimeout(function() {
+    cardsScreen.classList.remove('cards-fade-out');
+    cardsScreen.classList.add('hidden');
+    revealContent.innerHTML = getCongratulationsScreenHTML();
+    revealArea.classList.remove('summary-view', 'reveal-fade-in');
+    revealArea.classList.add('visible');
+    revealArea.style.opacity = '0';
+    revealArea.classList.add('reveal-fade-in');
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        revealArea.style.opacity = '1';
+      });
+    });
+    setTimeout(function() { revealArea.style.opacity = ''; }, fadeDuration);
+    var continueBtn = document.getElementById('congratsContinueBtn');
+    if (continueBtn) continueBtn.addEventListener('click', function() { showProposalScreen(); }, { once: true });
+  }, fadeDuration);
+}
+
 function showProposalScreen() {
   cardsScreen.classList.add('cards-fade-out');
   var fadeDuration = 1000;
@@ -1258,36 +1346,43 @@ function allRevealedSequence() {
   var cards = cardsContainer.querySelectorAll('.jackpot-card');
   var gfImg = (MESSAGE_CONFIG && MESSAGE_CONFIG.gfImage) ? MESSAGE_CONFIG.gfImage : 'images/gf.jpg';
   setTimeout(function() {
-    cards.forEach(function(c) {
+    cards.forEach(function(c, i) {
       var front = c.querySelector('.card-front');
-      if (front) front.classList.add('prize-faded');
+      if (!front) return;
+      front.style.backgroundImage = 'url(' + gfImg + ')';
+      front.classList.add('gf-quadrant', 'q' + i);
+      front.innerHTML = '';
     });
-    setTimeout(function() {
-      cards.forEach(function(c, i) {
-        var front = c.querySelector('.card-front');
-        if (!front) return;
-        front.style.backgroundImage = 'url(' + gfImg + ')';
-        front.classList.add('gf-quadrant', 'q' + i);
-        front.classList.remove('prize-faded');
-        front.innerHTML = '';
-      });
-      var continueBtn = document.getElementById('continueMadnessBtn');
-      if (continueBtn) continueBtn.classList.remove('hidden');
-      setTimeout(function() { formOneBigCard(cards); }, 500);
-    }, 500);
+    cardsContainer.offsetHeight;
+    cardsContainer.classList.add('flip-slow');
+    cards.forEach(function(c) { c.classList.remove('flipped'); });
+    var firstInner = cards[0].querySelector('.card-inner');
+    firstInner.addEventListener('transitionend', function onFlipBack() {
+      firstInner.removeEventListener('transitionend', onFlipBack);
+      cards.forEach(function(c) { c.classList.add('flipped'); });
+      var firstInner2 = cards[0].querySelector('.card-inner');
+      firstInner2.addEventListener('transitionend', function onFlipFront() {
+        firstInner2.removeEventListener('transitionend', onFlipFront);
+        cardsContainer.classList.remove('flip-slow');
+        var continueBtn = document.getElementById('continueMadnessBtn');
+        if (continueBtn) {
+          continueBtn.textContent = 'Congratulations';
+          continueBtn.classList.remove('hidden');
+        }
+        formOneBigCard(cards);
+      }, { once: true });
+    }, { once: true });
   }, 1200);
 }
 
 function formOneBigCard(cards) {
   if (!cards || cards.length !== 4) return;
   var containerRect = cardsContainer.getBoundingClientRect();
-  var cardWidth = containerRect.width / 2 - 7;
-  var cardHeight = containerRect.height / 2 - 7;
+  var cardRects = [];
+  for (var i = 0; i < 4; i++) cardRects.push(cards[i].getBoundingClientRect());
   cardsContainer.style.minHeight = containerRect.height + 'px';
   cardsContainer.style.minWidth = containerRect.width + 'px';
   cardsContainer.classList.add('cards-forming-one');
-  var cardRects = [];
-  for (var i = 0; i < 4; i++) cardRects.push(cards[i].getBoundingClientRect());
   var bigW = cardRects[0].width * 2;
   var bigH = cardRects[0].height * 2;
   var bigLeft = (containerRect.width - bigW) / 2;
@@ -1373,7 +1468,7 @@ document.getElementById('startBtn').addEventListener('click', function() {
 var continueMadnessBtn = document.getElementById('continueMadnessBtn');
 if (continueMadnessBtn) {
   continueMadnessBtn.addEventListener('click', function() {
-    showProposalScreen();
+    showCongratulationsMessage();
   });
 }
 
