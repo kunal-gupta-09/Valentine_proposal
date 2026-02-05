@@ -167,6 +167,13 @@
     font-size: 28px;
     font-weight: normal;
   }
+  .card-back img {
+    max-width: 72%;
+    max-height: 72%;
+    object-fit: contain;
+    display: block;
+    pointer-events: none;
+  }
   .card-front {
     background: rgba(255,255,255,0.98);
     background-size: cover;
@@ -280,8 +287,22 @@
     flex: 1;
     min-width: 0;
   }
-  #revealArea .final-summary-content h1 { color: #333; }
-  #revealArea .final-summary-content h2 { color: #ff4d6d; }
+  #revealArea .final-summary-content,
+  #revealArea .final-summary-content h1,
+  #revealArea .final-summary-content h2,
+  #revealArea .winnings-list,
+  #revealArea .winnings-list li,
+  #revealArea .last-page .last-line {
+    font-family: 'Cormorant Garamond', serif;
+  }
+  #revealArea .final-summary-content h1 {
+    color: #333;
+    font-weight: 700;
+  }
+  #revealArea .final-summary-content h2 {
+    color: #ff4d6d;
+    font-weight: 700;
+  }
   #revealArea .final-summary-valentine-img {
     display: block;
     width: 100%;
@@ -316,7 +337,11 @@
     object-fit: contain;
   }
   #revealArea .winnings-list { text-align: left; margin: 0; padding-left: 24px; }
-  #revealArea .winnings-list li { margin: 8px 0; color: #555; }
+  #revealArea .winnings-list li {
+    margin: 8px 0;
+    color: #555;
+    font-weight: 600;
+  }
   #revealArea .last-page {
     margin-top: 32px;
     padding-top: 28px;
@@ -325,7 +350,7 @@
   }
   #revealArea .last-page .last-line {
     font-size: 1.35rem;
-    font-weight: 600;
+    font-weight: 700;
     color: #333;
     margin: 0 0 8px;
     letter-spacing: 0.02em;
@@ -562,6 +587,14 @@
     50% { transform-origin: center; transform: translate(-32vmin, -4.2vmin) rotateY(-80deg) rotateX(35deg); }
     75% { transform-origin: center; transform: translate(-36vmin, 1.1vmin) rotateY(-80deg) rotateX(35deg); }
   }
+  /* Proposal screen background */
+  #revealArea .proposal-screen-wrap {
+    background: linear-gradient(rgba(255,255,255,0.75), rgba(255,255,255,0.7)), url('images/Proposal_question.jpg') center / cover no-repeat;
+    border-radius: 16px;
+    padding: 28px 24px 32px;
+    margin: -32px -32px 0;
+    min-height: 360px;
+  }
   #revealArea .proposal-image-wrap {
     margin: 14px 0 18px;
     text-align: center;
@@ -586,6 +619,22 @@
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
   }
+  /* Proposal screen typography */
+  #revealArea .proposal-screen-wrap h1,
+  #revealArea .proposal-screen-wrap .proposal-intro,
+  #revealArea .proposal-screen-wrap #proposalQuestion {
+    font-family: 'Cormorant Garamond', serif;
+    color: #333;
+  }
+  #revealArea .proposal-screen-wrap .proposal-intro {
+    font-size: 1.25rem;
+    margin: 0 0 10px;
+  }
+  #revealArea .proposal-screen-wrap #proposalQuestion {
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin: 0 0 12px;
+  }
   #revealArea .buttons {
     position: relative;
     margin-top: 20px;
@@ -605,6 +654,9 @@
     align-items: center;
     text-align: center;
     padding: 24px 20px 28px;
+    background: linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0.45)), url('images/wait_msg_background.jpg') center / cover no-repeat;
+    border-radius: 16px;
+    min-height: 280px;
   }
   #revealArea .congrats-screen-wrap .congrats-img {
     width: 100%;
@@ -636,6 +688,46 @@
     transition: background 0.2s, transform 0.15s;
   }
   #revealArea .congrats-screen-wrap .congrats-continue-btn:hover {
+    background: #e84393;
+    transform: scale(1.02);
+  }
+  /* Appreciation message screen (before proposal) */
+  #revealArea .appreciation-screen-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 28px 24px 32px;
+    background: linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0.45)), url('images/wait_msg_background.jpg') center / cover no-repeat;
+    border-radius: 16px;
+    min-height: 320px;
+  }
+  #revealArea .appreciation-screen-wrap .appreciation-message {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.25rem;
+    color: #333;
+    line-height: 1.7;
+    margin: 0 0 28px;
+    max-width: 360px;
+  }
+  #revealArea .appreciation-screen-wrap .appreciation-message p {
+    margin: 0 0 1em;
+  }
+  #revealArea .appreciation-screen-wrap .appreciation-message p:last-of-type { margin-bottom: 0; }
+  #revealArea .appreciation-screen-wrap .appreciation-continue-btn {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    padding: 14px 32px;
+    font-size: 18px;
+    border: none;
+    border-radius: 30px;
+    background: #ff4d6d;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    box-shadow: 0 4px 16px rgba(255, 77, 109, 0.4);
+    transition: background 0.2s, transform 0.15s;
+  }
+  #revealArea .appreciation-screen-wrap .appreciation-continue-btn:hover {
     background: #e84393;
     transform: scale(1.02);
   }
@@ -976,10 +1068,11 @@ var MESSAGE_CONFIG = {
 /* ---------- Jackpot flow ---------- */
 var PRIZES = ['Flower', 'Sweet', 'Soft toy', 'Date night'];
 var PRIZE_IMAGES = ['images/flower.jpg', 'images/Sweet.jpg', 'images/soft_toys.jpg', 'images/Date_night.jpg'];
+/* Personalize the 4 surprise-card quizzes: edit question, options (exactly 3), and correctIndex (0, 1, or 2). */
 var CARD_QUIZZES = [
-  { question: "What do I love giving you most?", options: ["Flowers", "Chocolates", "Socks"], correctIndex: 0 },
-  { question: "What sweet thing do we share?", options: ["Dessert", "Sweet moments", "Nothing"], correctIndex: 1 },
-  { question: "What cuddly gift fits you?", options: ["A book", "A soft toy", "A plant"], correctIndex: 1 },
+  { question: "What do I love giving you most?", options: ["Flowers", "Chocolates", "Stress😅"], correctIndex: 0 },
+  { question: "What sweet thing do we share?", options: ["Dessert", "Your Kiss", "Nothing😔"], correctIndex: 0   },
+  { question: "What cuddly gift fits you?", options: ["A book", "A soft toy", "me 😎"], correctIndex: 1 },
   { question: "What's the best way to spend time together?", options: ["Date night", "Texting", "Sleeping alone"], correctIndex: 0 }
 ];
 var prizeIndex = 0;
@@ -1129,7 +1222,7 @@ var FLOATS_PER_TYPE = 8;
   }
 })();
 
-var CARD_EMOJIS = ['❤️', '💕', '🌹', '🎁', '💖'];
+var CARD_BACK_IMAGES = ['images/Q1.png', 'images/Q2.png', 'images/Q3.png', 'images/Q4.png'];
 function shuffleArray(arr) {
   for (var i = arr.length - 1; i > 0; i--) {
     var j = Math.floor(Math.random() * (i + 1));
@@ -1172,11 +1265,11 @@ function renderCards() {
   var continueBtn = document.getElementById('continueMadnessBtn');
   if (continueBtn) continueBtn.classList.add('hidden');
   for (var i = 0; i < 4; i++) {
-    var emoji = CARD_EMOJIS[Math.floor(Math.random() * CARD_EMOJIS.length)];
+    var imgSrc = (CARD_BACK_IMAGES[i] || 'images/Q1.png').replace(/"/g, '&quot;');
     var card = document.createElement('div');
     card.className = 'jackpot-card';
     card.dataset.prizeIndex = order[i];
-    card.innerHTML = '<div class="card-inner"><div class="card-back">' + emoji + '</div><div class="card-front"></div></div>';
+    card.innerHTML = '<div class="card-inner"><div class="card-back"><img src="' + imgSrc + '" alt=""></div><div class="card-front"></div></div>';
     cardsContainer.appendChild(card);
   }
 }
@@ -1212,7 +1305,7 @@ function getProposalHTML() {
   if (MESSAGE_CONFIG.proposalImage) {
     imgHtml = '<div class="proposal-image-wrap"><img src="' + MESSAGE_CONFIG.proposalImage.replace(/"/g, '&quot;') + '" alt="" class="proposal-shy-img" onerror="this.parentElement.style.display=\'none\'"></div>';
   }
-  return '<h1>Hey You ❤️</h1><p>I was wondering something…</p><h2 id="proposalQuestion"><span id="proposalQuestionText"></span></h2>' + imgHtml + '<div class="buttons proposal-buttons-hidden"><button type="button" id="yesBtn">Yes 💖</button><button type="button" id="noBtn">No 🙃</button></div>';
+  return '<div class="proposal-screen-wrap"><h1>Bebulaaaaaa❤️</h1><p class="proposal-intro">I was wondering something…</p><h2 id="proposalQuestion"><span id="proposalQuestionText"></span></h2>' + imgHtml + '<div class="buttons proposal-buttons-hidden"><button type="button" id="yesBtn">Yes 💖</button><button type="button" id="noBtn">No 🙃</button></div></div>';
 }
 
 function runProposalSequence() {
@@ -1287,6 +1380,25 @@ function getCongratulationsScreenHTML() {
     '</div>';
 }
 
+function escapeHtml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function getAppreciationScreenHTML() {
+  var lines = [
+    "Before anything else…",
+    "I just want you to know how much I appreciate having you in my life.",
+    "The way you think, the way you feel things deeply, the way you understand people — including me.",
+    "So here's the question I've been holding onto."
+  ];
+  var html = '<div class="appreciation-screen-wrap"><div class="appreciation-message">';
+  lines.forEach(function(line) {
+    html += '<p>' + escapeHtml(line) + '</p>';
+  });
+  html += '</div><button type="button" class="appreciation-continue-btn" id="appreciationContinueBtn">Continue</button></div>';
+  return html;
+}
+
 function showCongratulationsMessage() {
   cardsScreen.classList.add('cards-fade-out');
   var fadeDuration = 1000;
@@ -1305,8 +1417,24 @@ function showCongratulationsMessage() {
     });
     setTimeout(function() { revealArea.style.opacity = ''; }, fadeDuration);
     var continueBtn = document.getElementById('congratsContinueBtn');
-    if (continueBtn) continueBtn.addEventListener('click', function() { showProposalScreen(); }, { once: true });
+    if (continueBtn) continueBtn.addEventListener('click', function() { showAppreciationMessage(); }, { once: true });
   }, fadeDuration);
+}
+
+function showAppreciationMessage() {
+  revealContent.innerHTML = getAppreciationScreenHTML();
+  revealArea.classList.remove('summary-view', 'reveal-fade-in');
+  revealArea.classList.add('visible');
+  revealArea.style.opacity = '0';
+  revealArea.classList.add('reveal-fade-in');
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      revealArea.style.opacity = '1';
+    });
+  });
+  setTimeout(function() { revealArea.style.opacity = ''; }, 1000);
+  var continueBtn = document.getElementById('appreciationContinueBtn');
+  if (continueBtn) continueBtn.addEventListener('click', function() { showProposalScreen(); }, { once: true });
 }
 
 function showProposalScreen() {
